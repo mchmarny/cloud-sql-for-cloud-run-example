@@ -48,7 +48,7 @@ gcloud sql ssl client-certs describe client \
     --format 'value(cert)' > "${CONF_DIR}/client.pem"
 
 gcloud sql instances describe $INSTANCE \
-    --format 'value(serverCaCert.cert)' > "${CONF_DIR}/server.pem"
+    --format 'value(serverCaCert.cert)' > "${CONF_DIR}/ca.pem"
 
 echo "Generated passwords and keys saved in:"
 echo $CONF_DIR

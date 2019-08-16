@@ -9,7 +9,7 @@ export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
 mysql -h $INSTANCE_IP \
       -u root \
       --ssl-mode VERIFY_CA \
-      --ssl-ca "${CONF_DIR}/server.pem" \
+      --ssl-ca "${CONF_DIR}/ca.pem" \
       --ssl-cert "${CONF_DIR}/client.pem" \
       --ssl-key "${CONF_DIR}/client.key" \
       $INSTANCE < sql/schema.ddl
