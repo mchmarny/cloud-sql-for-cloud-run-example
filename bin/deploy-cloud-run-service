@@ -1,9 +1,0 @@
-#!/bin/bash
-
-gcloud beta run deploy gotemplate \
-	--allow-unauthenticated \
-	--image gcr.io/$PROJECT/gorunstarter:0.0.1 \
-	--platform managed \
-	--region us-central1 \
-	--set-env-vars "RELEASE=v0.0.1" \
-	--service-account gorunstarter-sa@${PROJECT}.iam.gserviceaccount.com

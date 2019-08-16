@@ -1,5 +1,14 @@
 #!/bin/bash
 
-echo $(gcloud beta run services describe gotemplate \
-    --region us-central1 \
-    --format="value(status.domain)")
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+
+gcloud sql instances describe ${INSTANCE} \
+    --format='value(ipAddresses[0].ipAddress)'
+
+
+gcloud beta run services describe $SERVICE_NAME \
+    --region $SERVICE_REGION \
+    --platform managed \
+    --format "value(status.domain)"

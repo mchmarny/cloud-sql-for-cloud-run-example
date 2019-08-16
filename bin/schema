@@ -1,0 +1,19 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
+    --format='value(ipAddresses[0].ipAddress)')
+
+mysql -h $INSTANCE_IP \
+      -u root \
+      --ssl-mode VERIFY_CA \
+      --ssl-ca "${CONF_DIR}/server.pem" \
+      --ssl-cert "${CONF_DIR}/client.pem" \
+      --ssl-key "${CONF_DIR}/client.key" \
+      $INSTANCE < sql/schema.ddl
+
+
+
+

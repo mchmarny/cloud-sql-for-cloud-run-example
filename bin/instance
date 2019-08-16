@@ -1,0 +1,54 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+mkdir -p $CONF_DIR
+
+export ROOT_PASSWORD=$(openssl rand -base64 32)
+echo "${ROOT_PASSWORD}" > "${CONF_DIR}/root_password"
+
+export APP_PASSWORD=$(openssl rand -base64 32)
+echo "${APP_PASSWORD}" > "${CONF_DIR}/app_password"
+
+gcloud sql instances create $INSTANCE \
+    --database-version MYSQL_5_6 \
+    --tier $NODE_TIER \
+    --require-ssl \
+    --authorized-networks 0.0.0.0/0 \
+    --activation-policy ALWAYS \
+    --availability-type zonal \
+    --zone $NODE_ZONE \
+    --enable-bin-log \
+    --failover-replica-name "${INSTANCE}-replica" \
+    --storage-size 40GB \
+    --storage-type SSD \
+    --storage-auto-increase \
+    --backup \
+    --backup-start-time 03:00 \
+    --maintenance-release-channel PRODUCTION \
+    --maintenance-window-day SUN \
+    --maintenance-window-hour 2 \
+    --root-password $ROOT_PASSWORD
+
+gcloud sql databases create $INSTANCE \
+    --instance $INSTANCE
+
+gcloud sql users create $INSTANCE \
+    --instance $INSTANCE \
+    --password $APP_PASSWORD \
+    --host %
+
+gcloud sql ssl client-certs create client \
+    "${CONF_DIR}/client.key" \
+    --instance $INSTANCE
+
+gcloud sql ssl client-certs describe client \
+    --instance $INSTANCE \
+    --format 'value(cert)' > "${CONF_DIR}/client.pem"
+
+gcloud sql instances describe $INSTANCE \
+    --format 'value(serverCaCert.cert)' > "${CONF_DIR}/server.pem"
+
+echo "Generated passwords and keys saved in:"
+echo $CONF_DIR

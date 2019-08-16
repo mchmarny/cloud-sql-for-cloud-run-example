@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export INSTANCE="demo1"
+export NODE_TIER="db-n1-standard-1"
+export NODE_ZONE="us-central1-a"
+export NODE_HD="40GB" #initial only
+export PROJECT=$(gcloud config get-value project)
+export CONF_DIR="${HOME}/.cloud-sql/${PROJECT}/${INSTANCE}"

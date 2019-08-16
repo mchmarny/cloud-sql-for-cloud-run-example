@@ -1,0 +1,13 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+gcloud beta run deploy $SERVICE_NAME \
+	--image "gcr.io/${PROJECT}/${SERVICE_NAME}:${SERVICE_VERSION}" \
+    --service-account "${SERVICE_NAME}-sa@${PROJECT}.iam.gserviceaccount.com" \
+	--allow-unauthenticated \
+    --platform managed \
+	--region $SERVICE_REGION \
+	--add-cloudsql-instances $SERVICE_NAME \
+	--set-env-vars "RELEASE=v${SERVICE_VERSION},DSN=${SERVICE_NAME}-db-user:${DB_USER_SECRET}@unix(/cloudsql/${PROJECT}:${SERVICE_REGION}:${SERVICE_NAME})/${SERVICE_NAME}-db?parseTime=true,OAUTH_CLIENT_ID=${LI_OAUTH_CLIENT_ID},OAUTH_CLIENT_SECRET=${LI_OAUTH_CLIENT_SECRET}"
