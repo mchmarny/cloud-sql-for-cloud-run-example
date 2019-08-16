@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1beta1
+kind: Service
+metadata:
+  name: gotemplate
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/cloudylabs-public/gotemplate:0.0.1
+          env:
+            - name: RELEASE
+              value: "v0.0.1-manual"

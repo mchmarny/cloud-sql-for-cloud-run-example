@@ -1,0 +1,10 @@
+#!/bin/bash
+
+gcloud beta run deploy gotemplate \
+	--allow-unauthenticated \
+	--cluster cr07 \
+	--cluster-location us-west1-c \
+	--image gcr.io/cloudylabs-public/gotemplate:0.0.1 \
+	--namespace demo \
+	--platform gke \
+	--set-env-vars "RELEASE=v0.0.1"

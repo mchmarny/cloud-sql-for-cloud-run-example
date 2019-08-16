@@ -1,0 +1,8 @@
+#!/bin/bash
+
+gcloud beta run services delete gotemplate \
+    --platform gke \
+    --region us-west1
+
+gcloud iam service-accounts delete \
+    gotemplate-sa@$cloudylabs-public.iam.gserviceaccount.com
