@@ -28,11 +28,13 @@ var (
 
 func initData(ctx context.Context) {
 
+	// HACK: go mysql client doesn't read cnf files
+	// https://github.com/go-sql-driver/mysql/issues/542
 	loadClientCerts()
 
 	c, err := sql.Open("mysql", connString)
 	if err != nil {
-		logger.Fatalf("Error connecting to DB (%s): %v", connString, err)
+		logger.Fatalf("Error connecting to DB: %v", err)
 	}
 
 	if err := c.Ping(); err != nil {
