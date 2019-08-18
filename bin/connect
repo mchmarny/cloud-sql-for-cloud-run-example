@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
+    --format='value(ipAddresses[0].ipAddress)')
+
+mysql -h ${INSTANCE_IP} -u root

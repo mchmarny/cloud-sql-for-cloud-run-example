@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"github.com/thinkerou/favicon"
 
 	ev "github.com/mchmarny/gcputil/env"
+	pr "github.com/mchmarny/gcputil/project"
 )
 
 const (
@@ -17,11 +19,19 @@ const (
 )
 
 var (
-	release = ev.MustGetEnvVar("RELEASE", "v0.0.1")
-	logger  = log.New(os.Stdout, "[APP] ", 0)
+	logger     = log.New(os.Stdout, "", 0)
+	projectID  = pr.GetIDOrFail()
+	connString = ev.MustGetEnvVar("DSN", "")
+	certBucket = ev.MustGetEnvVar("CERTS", "")
+	kmsKeyRing = ev.MustGetEnvVar("KEYRING", "")
 )
 
 func main() {
+
+	ctx := context.Background()
+	initSecrets(ctx)
+	initData(ctx)
+	defer finalizeData(ctx)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
@@ -35,7 +45,7 @@ func main() {
 	// api
 	v1 := r.Group("/v1")
 	{
-		v1.GET("/message/:msg", apiRequestHandler)
+		v1.GET("/test", apiRequestHandler)
 	}
 
 	// server

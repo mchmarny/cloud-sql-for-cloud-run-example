@@ -3,13 +3,7 @@
 DIR="$(dirname "$0")"
 . "${DIR}/config"
 
-mkdir -p $CONF_DIR
-
-export ROOT_PASSWORD=$(openssl rand -base64 32)
-echo "${ROOT_PASSWORD}" > "${CONF_DIR}/root_password"
-
-export APP_PASSWORD=$(openssl rand -base64 32)
-echo "${APP_PASSWORD}" > "${CONF_DIR}/app_password"
+export ROOT_PASSWORD=$(<"${CONF_DIR}/root_password")
 
 gcloud sql instances create $INSTANCE \
     --database-version MYSQL_5_6 \
@@ -31,14 +25,16 @@ gcloud sql instances create $INSTANCE \
     --maintenance-window-hour 2 \
     --root-password $ROOT_PASSWORD
 
-gcloud sql databases create $INSTANCE \
+gcloud sql databases create $DB_NAME \
     --instance $INSTANCE
 
-gcloud sql users create $INSTANCE \
+export APP_PASSWORD=$(<"${CONF_DIR}/app_password")
+gcloud sql users create $DB_USER \
     --instance $INSTANCE \
     --password $APP_PASSWORD \
     --host %
 
+rm -f "${CONF_DIR}/client.key"
 gcloud sql ssl client-certs create client \
     "${CONF_DIR}/client.key" \
     --instance $INSTANCE

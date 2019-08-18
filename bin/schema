@@ -12,7 +12,7 @@ mysql -h $INSTANCE_IP \
       --ssl-ca "${CONF_DIR}/ca.pem" \
       --ssl-cert "${CONF_DIR}/client.pem" \
       --ssl-key "${CONF_DIR}/client.key" \
-      $INSTANCE < sql/schema.ddl
+      $DB_NAME < sql/schema.ddl
 
 
 

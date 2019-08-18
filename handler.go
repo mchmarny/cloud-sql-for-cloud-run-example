@@ -14,22 +14,12 @@ func healthHandler(c *gin.Context) {
 
 func apiRequestHandler(c *gin.Context) {
 
-	msg := c.Param("msg")
-	logger.Printf("Message: %s", msg)
-	if msg == "" {
-		logger.Println("Error on nil msg parameter")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Null Argument",
-			"status":  http.StatusBadRequest,
-		})
-		return
-	}
-
 	resp := &ResponseObject{
-		ID:      newID(),
+		ID:      newResponseID(),
 		Ts:      time.Now().UTC().String(),
-		Release: release,
-		Message: msg,
+		Bucket:  certBucket,
+		Conn:    connString,
+		KeyRing: kmsKeyRing,
 	}
 
 	c.JSON(http.StatusOK, resp)
@@ -38,7 +28,7 @@ func apiRequestHandler(c *gin.Context) {
 
 func defaultRequestHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Try the API at /v1/message/:msg",
+		"message": "See /v1/test",
 		"status":  http.StatusOK,
 	})
 }
@@ -47,11 +37,12 @@ func defaultRequestHandler(c *gin.Context) {
 type ResponseObject struct {
 	ID      string `json:"id"`
 	Ts      string `json:"ts"`
-	Release string `json:"rel"`
-	Message string `json:"msg,omitempty"`
+	Bucket  string `json:"conf"`
+	Conn    string `json:"conn"`
+	KeyRing string `json:"keyring"`
 }
 
-func newID() string {
+func newResponseID() string {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		logger.Fatalf("Error while getting id: %v\n", err)
