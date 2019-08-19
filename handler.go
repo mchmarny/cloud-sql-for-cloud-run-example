@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -13,6 +14,12 @@ func healthHandler(c *gin.Context) {
 }
 
 func apiRequestHandler(c *gin.Context) {
+
+	// TODO: do it once on server start
+	ctx := context.Background()
+	initSecrets(ctx)
+	initData(ctx)
+	defer finalizeData(ctx)
 
 	// TODO: Normalize this across sessions
 	sessionID := newResponseID()

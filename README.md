@@ -47,6 +47,15 @@ bin/env
 
 ![](img/connui.png)
 
+### Certificates
+
+Create KMS keys, encrypt Cloud SQL instance certificates and save them to GCS bucket
+
+```shell
+bin/secret
+```
+
+
 ## Cloud Run
 
 ### Container Image

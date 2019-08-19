@@ -1,0 +1,18 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+
+export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
+    --format='value(ipAddresses[0].ipAddress)')
+
+echo "DSN=\"root@tcp(${INSTANCE_IP})/sqlcrdb?parseTime=true\""
+echo "CERTS=\"${CONF_BUCKET}\""
+echo "KEYRING=\"projects/${PROJECT}/locations/global/keyRings/${SERVICE}\""
+
+
+gcloud beta run services describe $SERVICE \
+    --region $SERVICE_REGION \
+    --platform managed \
+    --format "value(status.domain)"

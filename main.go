@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net"
 	"os"
@@ -27,11 +26,6 @@ var (
 )
 
 func main() {
-
-	ctx := context.Background()
-	initSecrets(ctx)
-	initData(ctx)
-	defer finalizeData(ctx)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()

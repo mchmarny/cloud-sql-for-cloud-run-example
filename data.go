@@ -62,10 +62,13 @@ func initData(ctx context.Context) {
 func configTLS() string {
 
 	certDirPath := getCertDirPath()
+
 	caPath := filepath.Join(certDirPath, "ca.pem")
 	failIfFileNotExists(caPath)
+
 	certPath := filepath.Join(certDirPath, "client.pem")
 	failIfFileNotExists(certPath)
+
 	keyPath := filepath.Join(certDirPath, "client.key")
 	failIfFileNotExists(keyPath)
 

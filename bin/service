@@ -3,6 +3,9 @@
 DIR="$(dirname "$0")"
 . "${DIR}/config"
 
+export DSN="root@tcp(${INSTANCE_IP})/sqlcrdb?parseTime=true"
+export KEYRING="projects/${PROJECT}/locations/global/keyRings/${SERVICE}"
+
 gcloud beta run deploy $SERVICE \
 	--image "gcr.io/${PROJECT}/${SERVICE}:${SERVICE_VERSION}" \
     --service-account $SERVICE_ACCOUNT \
@@ -10,4 +13,5 @@ gcloud beta run deploy $SERVICE \
     --platform managed \
 	--region $SERVICE_REGION \
 	--add-cloudsql-instances $INSTANCE \
-	--set-env-vars "DSN=${DSN},CERTS=${CERTS},KEYRING=${KEYRING}"
+	--set-env-vars "DSN=${DSN},CERTS=${CONF_BUCKET},KEYRING=${KEYRING}"
+
