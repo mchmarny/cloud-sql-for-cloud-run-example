@@ -11,7 +11,6 @@ import (
 	"crypto/x509"
 	"database/sql"
 
-	_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/mysql"
 	"github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
 )

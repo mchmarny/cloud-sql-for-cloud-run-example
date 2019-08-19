@@ -7,12 +7,6 @@ cloud.google.com/go/internal/optional
 cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 cloud.google.com/go/compute/metadata
-# github.com/GoogleCloudPlatform/cloudsql-proxy v0.0.0-20190725230627-253d1edd4416
-github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/mysql
-github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/proxy
-github.com/GoogleCloudPlatform/cloudsql-proxy/logging
-github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/certs
-github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/util
 # github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3
 github.com/gin-contrib/sse
 # github.com/gin-gonic/gin v1.4.0
@@ -71,10 +65,10 @@ go.opencensus.io/metric/metricproducer
 go.opencensus.io/resource
 # golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7
 golang.org/x/net/trace
-golang.org/x/net/context
 golang.org/x/net/internal/timeseries
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
+golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
 golang.org/x/net/idna
@@ -104,7 +98,6 @@ google.golang.org/api/googleapi/internal/uritemplates
 google.golang.org/api/gensupport
 google.golang.org/api/googleapi/transport
 google.golang.org/api/transport/http/internal/propagation
-google.golang.org/api/sqladmin/v1beta4
 # google.golang.org/appengine v1.6.1
 google.golang.org/appengine/cloudsql
 google.golang.org/appengine/urlfetch

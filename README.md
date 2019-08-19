@@ -117,7 +117,23 @@ bin/service
 
 ## Test
 
-At this point you should be able to access your deployed service. Note, there is currently no way tp predict the service URL, specifically the bit between the service name (`cloudsql-demo`) and the static Cloud Run domain (`uc.a.run.app`). To get info about the deployed service and backing Cloud SQL database run:
+### Local
+
+You can run the sample locally by executig the [bin/run](bin/run) script
+
+```shell
+bin/run
+```
+
+And navigating to http://localhost:8080/v1/test
+
+### Cloud Run
+
+At this point you should be able to access your deployed service.
+
+> Note, there is currently no way tp predict the service URL, specifically the bit between the service name (`cloudsql-demo`) and the static Cloud Run domain (`uc.a.run.app`).
+
+To get info about the deployed service and backing Cloud SQL database run:
 
 ```shell
 bin/info

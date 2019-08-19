@@ -11,7 +11,7 @@ export DB_USER="sqlcrdb-user"
 # cloud run config
 export SERVICE="cloudsql-demo"
 export SERVICE_REGION="us-central1"
-export SERVICE_VERSION="0.1.4"
+export SERVICE_VERSION="0.1.6"
 
 # derived
 export PROJECT=$(gcloud config get-value project)
