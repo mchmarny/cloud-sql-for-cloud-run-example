@@ -47,8 +47,8 @@ github.com/mchmarny/gcputil/meta
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/thinkerou/favicon v0.1.0
-github.com/thinkerou/favicon
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
 # github.com/ugorji/go v1.1.4
 github.com/ugorji/go/codec
 # go.opencensus.io v0.22.0

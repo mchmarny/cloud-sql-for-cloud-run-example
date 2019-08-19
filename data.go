@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"io/ioutil"
 	"os"
 
@@ -14,6 +13,7 @@ import (
 
 	_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/mysql"
 	"github.com/go-sql-driver/mysql"
+	"github.com/pkg/errors"
 )
 
 type mysqlDB struct {
@@ -26,20 +26,23 @@ var (
 	db *mysqlDB
 )
 
-func initData(ctx context.Context) {
+func initData(ctx context.Context) error {
 
 	// HACK: go mysql client doesn't read cnf files
 	// https://github.com/go-sql-driver/mysql/issues/542
-	dnsTLS := configTLS()
+	dnsTLS, err := configTLS()
+	if err != nil {
+		return errors.Wrap(err, "Error configuring TLS")
+	}
 
 	c, err := sql.Open("mysql", connString+dnsTLS)
 	if err != nil {
-		logger.Fatalf("Error connecting to DB: %v", err)
+		return errors.Wrap(err, "Error connecting to DB")
 	}
 
 	if err := c.Ping(); err != nil {
 		c.Close()
-		logger.Fatalf("Error connecting to DB: %v", err)
+		return errors.Wrap(err, "Error connecting to DB")
 	}
 
 	db = &mysqlDB{
@@ -49,44 +52,55 @@ func initData(ctx context.Context) {
 	if db.addCount, err = c.Prepare(`INSERT INTO counter
 		(session_id, count_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE
 		count_value = count_value + 1`); err != nil {
-		logger.Fatalf("Error on addCount prepare: %v", err)
+		return errors.Wrap(err, "Error on addCount prepare")
 	}
 
 	if db.getCount, err = c.Prepare(`SELECT count_value
 		FROM counter WHERE session_id = ?`); err != nil {
-		logger.Fatalf("Error on getCount prepare: %v", err)
+		return errors.Wrap(err, "Error on getCount prepare")
 	}
+
+	return nil
 
 }
 
-func configTLS() string {
+func configTLS() (dsnSufix string, err error) {
 
-	certDirPath := getCertDirPath()
+	certDirPath, e := getCertDirPath()
+	if err != nil {
+		return "", errors.Wrap(e, "Error getting cert dir path")
+	}
 
 	caPath := filepath.Join(certDirPath, "ca.pem")
-	failIfFileNotExists(caPath)
+	if _, err := os.Stat(caPath); os.IsNotExist(err) {
+		return "", errors.Wrapf(err, "Required file does not exist: %s", caPath)
+	}
 
 	certPath := filepath.Join(certDirPath, "client.pem")
-	failIfFileNotExists(certPath)
+	if _, err := os.Stat(certPath); os.IsNotExist(err) {
+		return "", errors.Wrapf(err, "Required file does not exist: %s", certPath)
+	}
 
 	keyPath := filepath.Join(certDirPath, "client.key")
-	failIfFileNotExists(keyPath)
+	if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+		return "", errors.Wrapf(err, "Required file does not exist: %s", keyPath)
+	}
 
 	rootCertPool := x509.NewCertPool()
 
 	pem, err := ioutil.ReadFile(caPath)
 	if err != nil {
-		logger.Fatal(err)
+		return "", errors.Wrapf(err, "Error reading cert: %s", caPath)
 	}
 
 	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-		logger.Fatal("Failed to append PEM")
+		return "", errors.Wrap(err, "Error appending PEM to TLS cert manager")
 	}
 
 	clientCert := make([]tls.Certificate, 0, 1)
 	certs, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
-		logger.Fatal(err)
+		return "", errors.Wrap(err, "Error loading certs")
 	}
 	clientCert = append(clientCert, certs)
 
@@ -96,7 +110,7 @@ func configTLS() string {
 		InsecureSkipVerify: true,
 	})
 
-	return "&tls=custom"
+	return "&tls=custom", nil
 
 }
 
@@ -151,11 +165,4 @@ func countSession(ctx context.Context, sessionID string) (c int64, err error) {
 
 	return sessionCount, nil
 
-}
-
-func failIfFileNotExists(filename string) {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) || info.IsDir() {
-		logger.Fatalf("Required file does not exist: %s", filename)
-	}
 }

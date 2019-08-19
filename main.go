@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/thinkerou/favicon"
 
 	ev "github.com/mchmarny/gcputil/env"
 	pr "github.com/mchmarny/gcputil/project"
@@ -27,10 +26,9 @@ var (
 
 func main() {
 
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
-	r.Use(favicon.New("./favicon.ico"))
 
 	// routes
 	r.GET("/", defaultRequestHandler)

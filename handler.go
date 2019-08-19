@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -15,25 +16,47 @@ func healthHandler(c *gin.Context) {
 
 func apiRequestHandler(c *gin.Context) {
 
-	// TODO: do it once on server start
-	ctx := context.Background()
-	initSecrets(ctx)
-	initData(ctx)
-	defer finalizeData(ctx)
-
 	// TODO: Normalize this across sessions
 	sessionID := newResponseID()
-
-	countSession(c.Request.Context(), sessionID)
 
 	resp := &ResponseObject{
 		ID:      sessionID,
 		Ts:      time.Now().UTC().String(),
 		Bucket:  certBucket,
-		Conn:    connString,
+		DSN:     connString,
 		KeyRing: kmsKeyRing,
 	}
 
+	// TODO: do it once on server start
+	ctx := context.Background()
+
+	err := initCertificates(ctx)
+	if err != nil {
+		logger.Printf("Error while initializing TLS certs: %v", err)
+		resp.Info = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	err = initData(ctx)
+	if err != nil {
+		logger.Printf("Error while initializing data: %v", err)
+		resp.Info = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	defer finalizeData(ctx)
+
+	count, err := countSession(c.Request.Context(), sessionID)
+	if err != nil {
+		logger.Printf("Error while quering DB: %v", err)
+		resp.Info = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	resp.Info = fmt.Sprintf("Success - records saved: %d", count)
 	c.JSON(http.StatusOK, resp)
 
 }
@@ -47,11 +70,12 @@ func defaultRequestHandler(c *gin.Context) {
 
 // ResponseObject represents body of the request response
 type ResponseObject struct {
-	ID      string `json:"id"`
-	Ts      string `json:"ts"`
-	Bucket  string `json:"conf"`
-	Conn    string `json:"conn"`
-	KeyRing string `json:"keyring"`
+	ID      string `json:"request_id"`
+	Ts      string `json:"request_on"`
+	Bucket  string `json:"cert_bucket"`
+	DSN     string `json:"db_conn_str"`
+	KeyRing string `json:"key_ring"`
+	Info    string `json:"info,omitempty"`
 }
 
 func newResponseID() string {
