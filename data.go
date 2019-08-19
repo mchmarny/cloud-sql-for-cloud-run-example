@@ -30,9 +30,9 @@ func initData(ctx context.Context) {
 
 	// HACK: go mysql client doesn't read cnf files
 	// https://github.com/go-sql-driver/mysql/issues/542
-	loadClientCerts()
+	dnsTLS := configTLS()
 
-	c, err := sql.Open("mysql", connString)
+	c, err := sql.Open("mysql", connString+dnsTLS)
 	if err != nil {
 		logger.Fatalf("Error connecting to DB: %v", err)
 	}
@@ -59,9 +59,10 @@ func initData(ctx context.Context) {
 
 }
 
-func loadClientCerts() {
+func configTLS() string {
 
-	certDirPath := getCertDirPath()
+	//certDirPath := getCertDirPath()
+	certDirPath := "/Users/mchmarny/.cloud-sql/cloudylabs/demo3"
 	caPath := filepath.Join(certDirPath, "ca.pem")
 	failIfFileNotExists(caPath)
 	certPath := filepath.Join(certDirPath, "client.pem")
@@ -92,6 +93,8 @@ func loadClientCerts() {
 		Certificates:       clientCert,
 		InsecureSkipVerify: true,
 	})
+
+	return "&tls=custom"
 
 }
 
