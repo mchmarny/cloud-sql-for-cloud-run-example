@@ -43,7 +43,7 @@ The [bin/env](bin/env) script creates `.my.cnf` file in your home directory with
 bin/env
 ```
 
-![](img/connect.png)
+![](img/connui.png)
 
 ## Cloud Run
 
