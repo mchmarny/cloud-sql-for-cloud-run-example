@@ -61,8 +61,7 @@ func initData(ctx context.Context) {
 
 func configTLS() string {
 
-	//certDirPath := getCertDirPath()
-	certDirPath := "/Users/mchmarny/.cloud-sql/cloudylabs/demo3"
+	certDirPath := getCertDirPath()
 	caPath := filepath.Join(certDirPath, "ca.pem")
 	failIfFileNotExists(caPath)
 	certPath := filepath.Join(certDirPath, "client.pem")

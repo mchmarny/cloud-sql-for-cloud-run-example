@@ -30,7 +30,7 @@ func getCertDirPath() string {
 
 func initSecrets(ctx context.Context) {
 
-	_ = os.MkdirAll(getCertDirPath(), 0777)
+	_ = os.MkdirAll(getCertDirPath(), 0700)
 
 	gcsc, err := storage.NewClient(ctx)
 	checkFatalErr(err, "Error while creating GCS client")
