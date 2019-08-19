@@ -12,7 +12,7 @@ import "github.com/mchmarny/gcputil/env"
 Parse string environment variable
 
 ```shell
-name := env.MustGetEnvVar("ENV_VAR_NAME", "default-name")
+name := env.MustGetEnvVar("ENV_VAR_NAME", "default-value")
 ```
 
 Parse int environment variable

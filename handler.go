@@ -14,8 +14,13 @@ func healthHandler(c *gin.Context) {
 
 func apiRequestHandler(c *gin.Context) {
 
+	// TODO: Normalize this across sessions
+	sessionID := newResponseID()
+
+	countSession(c.Request.Context(), sessionID)
+
 	resp := &ResponseObject{
-		ID:      newResponseID(),
+		ID:      sessionID,
 		Ts:      time.Now().UTC().String(),
 		Bucket:  certBucket,
 		Conn:    connString,

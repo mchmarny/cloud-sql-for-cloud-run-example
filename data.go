@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"io/ioutil"
+	"os"
 
-	"os/user"
 	"path/filepath"
 
 	"crypto/tls"
@@ -60,27 +60,33 @@ func initData(ctx context.Context) {
 }
 
 func loadClientCerts() {
-	user, err := user.Current()
-	checkFatalErr(err, "Error getting current user")
 
-	localCertDirPath = filepath.Join(user.HomeDir, localCertDirName)
+	certDirPath := getCertDirPath()
+	caPath := filepath.Join(certDirPath, "ca.pem")
+	failIfFileNotExists(caPath)
+	certPath := filepath.Join(certDirPath, "client.pem")
+	failIfFileNotExists(certPath)
+	keyPath := filepath.Join(certDirPath, "client.key")
+	failIfFileNotExists(keyPath)
 
 	rootCertPool := x509.NewCertPool()
-	pem, err := ioutil.ReadFile(filepath.Join(localCertDirPath, "ca.pem"))
+
+	pem, err := ioutil.ReadFile(caPath)
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
 		logger.Fatal("Failed to append PEM")
 	}
 
 	clientCert := make([]tls.Certificate, 0, 1)
-	certs, err := tls.LoadX509KeyPair(filepath.Join(localCertDirPath, "client.pem"),
-		filepath.Join(localCertDirPath, "client.key"))
+	certs, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
 		logger.Fatal(err)
 	}
 	clientCert = append(clientCert, certs)
+
 	mysql.RegisterTLSConfig("custom", &tls.Config{
 		RootCAs:      rootCertPool,
 		Certificates: clientCert,
@@ -139,4 +145,11 @@ func countSession(ctx context.Context, sessionID string) (c int64, err error) {
 
 	return sessionCount, nil
 
+}
+
+func failIfFileNotExists(filename string) {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) || info.IsDir() {
+		logger.Fatalf("Required file does not exist: %s", filename)
+	}
 }

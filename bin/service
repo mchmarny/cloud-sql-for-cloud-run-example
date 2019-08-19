@@ -10,4 +10,4 @@ gcloud beta run deploy $SERVICE \
     --platform managed \
 	--region $SERVICE_REGION \
 	--add-cloudsql-instances $INSTANCE \
-	--set-env-vars "DSN=${TEST}"
+	--set-env-vars "DSN=${DSN},CERTS=${CERTS},KEYRING=${KEYRING}"

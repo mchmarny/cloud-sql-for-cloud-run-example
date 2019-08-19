@@ -7,5 +7,5 @@ go mod tidy
 go mod vendor
 
 gcloud builds submit \
-    --tag "gcr.io/${PROJECT}/${SERVICE_NAME}:${SERVICE_VERSION}"
+    --tag "gcr.io/${PROJECT}/${SERVICE}:${SERVICE_VERSION}"
 

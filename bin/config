@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # cloud sql config
-export INSTANCE="demo2"
+export INSTANCE="demo3"
 export NODE_TIER="db-n1-standard-1"
 export NODE_ZONE="us-central1-a"
 export NODE_HD="40GB" #initial only, will auto-grow
@@ -12,7 +12,7 @@ export DB_USER="sqlcrdb-user"
 export SERVICE="cloudsql-demo"
 export SERVICE_ACCOUNT="${SERVICE}@${PROJECT}.iam.gserviceaccount.com"
 export SERVICE_REGION="us-central1"
-export SERVICE_VERSION="0.1.1"
+export SERVICE_VERSION="0.1.2"
 
 # derived
 export PROJECT=$(gcloud config get-value project)

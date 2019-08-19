@@ -3,8 +3,6 @@
 DIR="$(dirname "$0")"
 . "${DIR}/config"
 
-export ROOT_PASSWORD=$(<"${CONF_DIR}/root_password")
-
 gcloud sql instances create $INSTANCE \
     --database-version MYSQL_5_6 \
     --tier $NODE_TIER \
@@ -23,15 +21,14 @@ gcloud sql instances create $INSTANCE \
     --maintenance-release-channel PRODUCTION \
     --maintenance-window-day SUN \
     --maintenance-window-hour 2 \
-    --root-password $ROOT_PASSWORD
+    --root-password $(<"${CONF_DIR}/root_password")
 
 gcloud sql databases create $DB_NAME \
     --instance $INSTANCE
 
-export APP_PASSWORD=$(<"${CONF_DIR}/app_password")
 gcloud sql users create $DB_USER \
     --instance $INSTANCE \
-    --password $APP_PASSWORD \
+    --password $(<"${CONF_DIR}/app_password") \
     --host %
 
 rm -f "${CONF_DIR}/client.key"
@@ -46,5 +43,5 @@ gcloud sql ssl client-certs describe client \
 gcloud sql instances describe $INSTANCE \
     --format 'value(serverCaCert.cert)' > "${CONF_DIR}/ca.pem"
 
-echo "Generated passwords and keys saved in:"
+echo "Client keys saved in:"
 echo $CONF_DIR

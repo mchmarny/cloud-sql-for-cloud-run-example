@@ -28,11 +28,10 @@ gcloud projects add-iam-policy-binding $PROJECT \
 	--member "serviceAccount:${SERVICE_ACCOUNT}" \
     --role roles/cloudsql.editor
 
-gcloud alpha secrets add-iam-policy-binding $INSTANCE \
-	--project $PROJECT \
+gcloud projects add-iam-policy-binding $PROJECT \
 	--member "serviceAccount:${SERVICE_ACCOUNT}" \
-	--role "roles/secretmanager.secretAccessor"
+    --role roles/cloudkms.cryptoKeyEncrypterDecrypter
 
-gsutil iam set \
-	"serviceAccount:${SERVICE_ACCOUNT}:objectViewer" \
-	$CONF_BUCKET
+gcloud projects add-iam-policy-binding $PROJECT \
+	--member "serviceAccount:${SERVICE_ACCOUNT}" \
+    --role roles/storage.objectViewer

@@ -11,5 +11,9 @@ gcloud services enable --quiet \
     containerregistry.googleapis.com \
     sqladmin.googleapis.com \
     run.googleapis.com \
-    secretmanager.googleapis.com
+    secretmanager.googleapis.com \
+    storage-api.googleapis.com
+
+
+
 

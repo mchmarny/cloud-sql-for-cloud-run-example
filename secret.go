@@ -14,25 +14,23 @@ import (
 )
 
 const (
-	localCertDirName = ".certs"
-	localConfigName  = ".my.cnf"
+	certDirName = ".certs"
 )
 
 var (
-	gcsClient        *storage.Client
-	kmsClient        *cloudkms.KeyManagementClient
-	localCertDirPath = ""
-	localConfigPath  = ""
+	gcsClient *storage.Client
+	kmsClient *cloudkms.KeyManagementClient
 )
+
+func getCertDirPath() string {
+	user, err := user.Current()
+	checkFatalErr(err, "Error getting current user")
+	return filepath.Join(user.HomeDir, certDirName)
+}
 
 func initSecrets(ctx context.Context) {
 
-	user, err := user.Current()
-	checkFatalErr(err, "Error getting current user")
-
-	localCertDirPath = filepath.Join(user.HomeDir, localCertDirName)
-	_ = os.Mkdir(localCertDirPath, os.ModeDir)
-	localConfigPath = filepath.Join(user.HomeDir, localConfigName)
+	_ = os.MkdirAll(getCertDirPath(), 0777)
 
 	gcsc, err := storage.NewClient(ctx)
 	checkFatalErr(err, "Error while creating GCS client")
@@ -50,17 +48,6 @@ func initSecrets(ctx context.Context) {
 
 	err = setupCert(ctx, "ca.pem")
 	checkFatalErr(err, "Error processing ca.pem")
-
-	// write mysql config file
-	confContent := fmt.Sprintf(`[client]
-ssl-mode=VERIFY_CA
-ssl-ca=%s/ca.pem
-ssl-cert=%s/client.pem
-ssl-key=%s/client.key
-`, localCertDirPath, localCertDirPath, localCertDirPath)
-
-	err = ioutil.WriteFile(localConfigPath, []byte(confContent), 0644)
-	checkFatalErr(err, "Error while saving %s: %v", localConfigPath, err)
 
 }
 
@@ -93,7 +80,7 @@ func setupCert(ctx context.Context, object string) error {
 	}
 
 	// write
-	certPath := filepath.Join(localCertDirPath, object)
+	certPath := filepath.Join(getCertDirPath(), object)
 	err = ioutil.WriteFile(certPath, []byte(resp.GetPlaintext()), 0644)
 	if err != nil {
 		logger.Printf("Error writting decrypted content to %s: %v", certPath, err)
