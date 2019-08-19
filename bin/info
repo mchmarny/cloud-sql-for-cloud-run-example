@@ -7,12 +7,22 @@ DIR="$(dirname "$0")"
 export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
     --format='value(ipAddresses[0].ipAddress)')
 
+echo "=== Cloud SQL ==="
 echo "DSN=\"root@tcp(${INSTANCE_IP})/sqlcrdb?parseTime=true\""
 echo "CERTS=\"${CONF_BUCKET}\""
 echo "KEYRING=\"projects/${PROJECT}/locations/global/keyRings/${SERVICE}\""
+echo ""
+echo "To connect: "
+echo "mysql -h ${INSTANCE_IP} -u root"
+echo ""
+echo ""
+echo "=== Cloud Run ==="
 
-
-gcloud beta run services describe $SERVICE \
+export SERVICE_URL=$(gcloud beta run services describe $SERVICE \
     --region $SERVICE_REGION \
     --platform managed \
-    --format "value(status.domain)"
+    --format 'value(status.domain)')
+
+echo "Test URL:"
+echo "${SERVICE_URL}/v1/test"
+

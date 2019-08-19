@@ -6,4 +6,5 @@ DIR="$(dirname "$0")"
 export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
     --format='value(ipAddresses[0].ipAddress)')
 
-mysql -h ${INSTANCE_IP} -u root
+mysql -h $INSTANCE_IP -u root
+
