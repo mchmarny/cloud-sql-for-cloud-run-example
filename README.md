@@ -1,11 +1,11 @@
 # cloud-sql-for-cloud-run-example
 
-The current Cloud SQL integration in Cloud Run is not yet 100% idiomatic. Following current Cloud Run documentation for Cloud SQL you will be asked to perform some GCP-specific steps:
+The current Cloud SQL integration in Cloud Run is not yet 100% idiomatic and does require couple GCP-specific steps:
 
 1. Side-effects import `_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/mysql"`
 2. Needing to run [Cloud SQL Proxy](https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test) during local development or testing
 
-This sample outlines a process of setting up Cloud SQL instance with secure (TLS) access that will work the same way from developer workstation as well as from within Cloud Run and require no GCP code.
+This sample outlines a process of setting up Cloud SQL instance with secure (TLS) access that will work the same way from developer workstation as well as from within Cloud Run.
 
 > Note, to keep this readme short, I will be asking you to execute scripts rather than listing here complete commands. You should really review each one of these scripts for content, and, to understand the individual commands so you can use them in the future.
 
@@ -33,7 +33,7 @@ cd logo-identifier
 
 ### Passwords
 
-The [bin/password](bin/password) script will generate root and app user passwords and saved them in a project scoped path under `.cloud-sql` folder in your home directory.
+The [bin/password](bin/password) script will generate root and app user passwords and save them in a project-scoped path under `.cloud-sql` folder in your home directory.
 
 ```shell
 bin/password
@@ -41,14 +41,14 @@ bin/password
 
 ### Instance
 
-The [bin/instance](bin/instance) will:
+The [bin/instance](bin/instance) script will:
 
-* Set up Cloud SQL instance and set default (root) user credentials
-* Create MySQL database in the new Cloud SQL instance
-* Configure Application database user and credentials
-* Create and download Client SSL certificates
+* Create a Cloud SQL instance and set the default (root) user credentials
+* Configure MySQL database in the new Cloud SQL instance
+* Set up application database user and its credentials
+* Create and download client SSL certificates from the newly created instance
 
-> Note, the created instance will be exposed to the world but allow only SSL connections. That means that even if someone obtained the root user password, they won't be able to connect to the databases without the client certificates
+> Note, while the created instance will be exposed to the world (`0.0.0.0/0`) ot requires SSL connection with valid certificates
 
 ```shell
 bin/instance
@@ -58,19 +58,21 @@ bin/instance
 
 The [bin/schema](bin/schema) script connects to the newly created Cloud SQL instance and applies database schema located in [sql/schema.ddl](sql/schema.ddl).
 
+> The provided script checks for existence of all the objects before creating them so you can run it multiple times. it only creates one simple table right now so feel free to edit it before executing the schema script
+
 ```shell
 bin/schema
 ```
 
-> This script checks for existence of the objects before creating them so you can run it multiple times. THis is also how you would apply schema changes.
-
 ### Environment Config
 
-The [bin/env](bin/env) script creates `.my.cnf` file in your home directory with SSL configuration (certificates and key paths) to aid in future connections.
+The [bin/env](bin/env) script creates `.my.cnf` [options file](https://dev.mysql.com/doc/refman/8.0/en/option-files.html) in your home directory with SSL configuration (certificates and key paths) to aid in future connections.
 
 ```shell
 bin/env
 ```
+
+### Test Connection
 
 At this point you should be able to connect to the newly created database with this command:
 
@@ -82,11 +84,9 @@ Alternatively, you can configure your client with a secure database connection:
 
 ![](img/connui.png)
 
-> To find out the exact paths to your TLS certificates, run `more ~/.my.cnf`
-
 ### Certificates
 
-Create KMS keys, encrypt Cloud SQL certificates, and save them to a GCS bucket
+The [bin/secret](bin/secret) script creates KMS keys, encrypts Cloud SQL certificates, and save them to a GCS bucket so that the Cloud Run service can securely obtain them while connecting to Cloud SQL DB
 
 ```shell
 bin/secret
@@ -98,7 +98,7 @@ Once the Cloud SQL instance is configured, you can now deploy the Cloud Run serv
 
 ### Container Image
 
-Build container image using the [bin/image](bin/image) script
+First, build container image from the included source using the [bin/image](bin/image) script
 
 ```shell
 bin/image
@@ -106,7 +106,7 @@ bin/image
 
 ### Service Account
 
-Create a service account and assign it the necessary roles using the [bin/user](bin/user) script
+After that, create a service account and assign it the necessary roles using the [bin/user](bin/user) script
 
 ```shell
 bin/user
@@ -114,27 +114,11 @@ bin/user
 
 ### Managed Service Deployment
 
-Once the container image and service account is ready, you can deploy the new service using [bin/service](bin/service) script
+Once the container image and service account are ready, you can deploy the new service using [bin/service](bin/service) script
 
 ```shell
 bin/service
 ```
-
-### Cloud Run on GKE or Knative Deployment
-
-
-
-## Test
-
-### Local
-
-You can run the sample locally by executing the [bin/run](bin/run) script
-
-```shell
-bin/run
-```
-
-And navigating to http://localhost:8080/v1/test
 
 ### Cloud Run
 
@@ -163,6 +147,15 @@ Now, navigate in browser to the service URL which will return a JSON response.
 
 If for some reason there were errors while inviting the service, the response will include the error details in the `info` field.
 
+### Run Service Locally
+
+You can run the sample service locally by executing the [bin/run](bin/run) script
+
+```shell
+bin/run
+```
+
+And navigating to http://localhost:8080/v1/test
 
 ## Disclaimer
 
