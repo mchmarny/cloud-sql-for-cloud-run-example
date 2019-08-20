@@ -1,0 +1,19 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+export DSN="root@tcp(${INSTANCE_IP})/sqlcrdb?parseTime=true"
+export KEYRING="projects/${PROJECT}/locations/global/keyRings/${SERVICE}"
+
+
+kubectl create cm cloudsql-config -n demo \
+    --from-literal=DSN=${DSN} \
+    --from-literal=CERTS=${CONF_BUCKET} \
+    --from-literal=KEYRING=${KEYRING}
+
+
+sed "s/SERVICE_NAME/$SERVICE/g; s/PROJECT_ID/$PROJECT/g; s/SERVICE_VERSION/$SERVICE_VERSION/g" \
+    conf/service.yaml | kubectl -n demo apply --filename -
+
+

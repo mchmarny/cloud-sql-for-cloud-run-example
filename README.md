@@ -107,7 +107,7 @@ Create a service account and assign it the necessary roles using the [bin/user](
 bin/user
 ```
 
-### Service Deployment
+### Managed Service Deployment
 
 Once the container image and service account is ready, you can deploy the new service using [bin/service](bin/service) script
 
@@ -115,11 +115,15 @@ Once the container image and service account is ready, you can deploy the new se
 bin/service
 ```
 
+### Cloud Run on GKE or Knative Deployment
+
+
+
 ## Test
 
 ### Local
 
-You can run the sample locally by executig the [bin/run](bin/run) script
+You can run the sample locally by executing the [bin/run](bin/run) script
 
 ```shell
 bin/run

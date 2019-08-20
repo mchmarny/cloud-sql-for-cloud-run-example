@@ -1,0 +1,27 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: cloudsql
+spec:
+  runLatest:
+    configuration:
+      revisionTemplate:
+        spec:
+          container:
+            image: gcr.io/PROJECT_ID/SERVICE_NAME:SERVICE_VERSION
+            env:
+              - name: DSN
+                valueFrom:
+                  configMapKeyRef:
+                    name: cloudsql-config
+                    key: DSN
+              - name: CERTS
+                valueFrom:
+                  configMapKeyRef:
+                    name: cloudsql-config
+                    key: CERTS
+              - name: KEYRING
+                valueFrom:
+                  configMapKeyRef:
+                    name: cloudsql-config
+                    key: KEYRING
