@@ -1,6 +1,11 @@
 # cloud-sql-for-cloud-run-example
 
-The current Cloud SQL integration in Cloud Run is not yet 100% idiomatic. Following current Cloud Run documentation for Cloud SQL you will be asked to perform some GCP-specific steps. This sample outlines a process of setting up Cloud SQL instance with secure (TLS) access that will work the same way from developer workstation as well as from within Cloud Run.
+The current Cloud SQL integration in Cloud Run is not yet 100% idiomatic. Following current Cloud Run documentation for Cloud SQL you will be asked to perform some GCP-specific steps:
+
+1. Side-effects import `_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/mysql"`
+2. Needing to run [Cloud SQL Proxy](https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test) during local development or testing
+
+This sample outlines a process of setting up Cloud SQL instance with secure (TLS) access that will work the same way from developer workstation as well as from within Cloud Run and require no GCP code.
 
 > Note, to keep this readme short, I will be asking you to execute scripts rather than listing here complete commands. You should really review each one of these scripts for content, and, to understand the individual commands so you can use them in the future.
 
