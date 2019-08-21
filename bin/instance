@@ -3,6 +3,8 @@
 DIR="$(dirname "$0")"
 . "${DIR}/config"
 
+mkdir -p $CONF_DIR
+
 gcloud sql instances create $INSTANCE \
     --database-version MYSQL_5_6 \
     --tier $NODE_TIER \
