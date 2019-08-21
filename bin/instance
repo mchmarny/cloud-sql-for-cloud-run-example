@@ -21,14 +21,14 @@ gcloud sql instances create $INSTANCE \
     --maintenance-release-channel PRODUCTION \
     --maintenance-window-day SUN \
     --maintenance-window-hour 2 \
-    --root-password $(<"${CONF_DIR}/root_password")
+    --root-password $(openssl rand -base64 32)
 
 gcloud sql databases create $DB_NAME \
     --instance $INSTANCE
 
 gcloud sql users create $DB_USER \
     --instance $INSTANCE \
-    --password $(<"${CONF_DIR}/app_password") \
+    --password $(openssl rand -base64 32) \
     --host %
 
 rm -f "${CONF_DIR}/client.key"

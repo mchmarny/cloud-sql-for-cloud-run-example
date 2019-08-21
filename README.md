@@ -31,24 +31,17 @@ cd logo-identifier
 
 ## Cloud SQL
 
-### Passwords
-
-The [bin/password](bin/password) script will generate root and app user passwords and save them in a project-scoped path under `.cloud-sql` folder in your home directory.
-
-```shell
-bin/password
-```
-
 ### Instance
 
 The [bin/instance](bin/instance) script will:
 
-* Create a Cloud SQL instance and set the default (root) user credentials
+* Create a Cloud SQL instance
+* Set the default (root) user credentials
 * Configure MySQL database in the new Cloud SQL instance
 * Set up application database user and its credentials
 * Create and download client SSL certificates from the newly created instance
 
-> Note, while the created instance will be exposed to the world (`0.0.0.0/0`) ot requires SSL connection with valid certificates
+> Note, while the created Cloud SQL instance will be exposed to the world (`0.0.0.0/0`), it allow only SSL connections. Also, since all connections will require valid client certificates, the root and app user passwords will be set to random 32 characters long passwords. If you ever decide to remove the SSL connection requirements, you can reset the root password in the Cloud SQL UI.
 
 ```shell
 bin/instance
@@ -56,7 +49,7 @@ bin/instance
 
 ### Schema
 
-The [bin/schema](bin/schema) script connects to the newly created Cloud SQL instance and applies database schema located in [sql/schema.ddl](sql/schema.ddl).
+The [bin/schema](bin/schema) script applies database schema located in [sql/schema.ddl](sql/schema.ddl).
 
 > The provided script checks for existence of all the objects before creating them so you can run it multiple times. it only creates one simple table right now so feel free to edit it before executing the schema script
 

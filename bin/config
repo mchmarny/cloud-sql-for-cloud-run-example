@@ -18,3 +18,4 @@ export PROJECT=$(gcloud config get-value project)
 export CONF_DIR="${HOME}/.cloud-sql/${PROJECT}/${INSTANCE}"
 export CONF_BUCKET="${PROJECT}-${SERVICE}"
 export SERVICE_ACCOUNT="${SERVICE}@${PROJECT}.iam.gserviceaccount.com"
+
