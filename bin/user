@@ -4,18 +4,9 @@ DIR="$(dirname "$0")"
 . "${DIR}/config"
 
 
-export SA_EXISTS=$(gcloud iam service-accounts list \
-	--format="get(email)" \
-	--filter="${SERVICE_ACCOUNT}")
-
-if test -z "$SA_EXISTS"
-then
-	gcloud iam service-accounts create $SERVICE \
-    	--display-name "Service Invoker Account for ${SERVICE}" \
-    	--quiet
-else
-	echo "User already exists: ${SERVICE_ACCOUNT}"
-fi
+gcloud iam service-accounts create $SERVICE \
+    --display-name "Service Invoker Account for ${SERVICE}" \
+    --quiet
 
 gcloud beta run services add-iam-policy-binding $SERVICE \
 	--member "serviceAccount:${SERVICE_ACCOUNT}" \
@@ -38,10 +29,5 @@ gcloud projects add-iam-policy-binding $PROJECT \
 	--member "serviceAccount:${SERVICE_ACCOUNT}" \
     --role roles/cloudsql.editor
 
-gcloud projects add-iam-policy-binding $PROJECT \
-	--member "serviceAccount:${SERVICE_ACCOUNT}" \
-    --role roles/cloudkms.cryptoKeyEncrypterDecrypter
-
-gcloud projects add-iam-policy-binding $PROJECT \
-	--member "serviceAccount:${SERVICE_ACCOUNT}" \
-    --role roles/storage.objectViewer
+gsutil iam ch "serviceAccount:${SERVICE_ACCOUNT}:objectViewer" \
+	"gs://${CONF_BUCKET}"

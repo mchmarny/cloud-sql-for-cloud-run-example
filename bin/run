@@ -12,7 +12,6 @@ export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
 
 export APP_PASSWORD=$(<"${CONF_DIR}/app_password")
 export DSN="${DB_USER}:${APP_PASSWORD}@tcp(${INSTANCE_IP})/sqlcrdb?parseTime=true"
-export KEYRING="projects/${PROJECT}/locations/global/keyRings/${INSTANCE}"
 export CERTS="${CONF_BUCKET}"
 
 go run *.go -v

@@ -2,16 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
 
-	cloudkms "cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/storage"
-	kmspb "google.golang.org/genproto/googleapis/cloud/kms/v1"
-
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +17,6 @@ const (
 
 var (
 	gcsClient *storage.Client
-	kmsClient *cloudkms.KeyManagementClient
 )
 
 func getCertDirPath() (path string, err error) {
@@ -55,12 +50,6 @@ func initCertificates(ctx context.Context) error {
 	}
 	gcsClient = gcsc
 
-	kmsc, err := cloudkms.NewKeyManagementClient(ctx)
-	if err != nil {
-		return errors.Wrap(err, "Error while creating KMS client")
-	}
-	kmsClient = kmsc
-
 	err = configureCert(ctx, certDirPath, "client.pem")
 	if err != nil {
 		return errors.Wrap(err, "Error processing client.pem")
@@ -89,25 +78,15 @@ func configureCert(ctx context.Context, certDirPath, object string) error {
 	}
 	defer o.Close()
 
+	// read
 	data, err := ioutil.ReadAll(o)
 	if err != nil {
 		return errors.Wrap(err, "Error reading object content")
 	}
 
-	keyID := fmt.Sprintf("%s/cryptoKeys/config", kmsKeyRing)
-	dr := &kmspb.DecryptRequest{
-		Name:       keyID,
-		Ciphertext: data,
-	}
-
-	resp, err := kmsClient.Decrypt(ctx, dr)
-	if err != nil {
-		return errors.Wrapf(err, "Error decrypting using key %s", keyID)
-	}
-
 	// write
 	certPath := filepath.Join(certDirPath, object)
-	err = ioutil.WriteFile(certPath, []byte(resp.GetPlaintext()), 0644)
+	err = ioutil.WriteFile(certPath, data, 0644)
 	if err != nil {
 		return errors.Wrapf(err, "Error writting decrypted content to %s", certPath)
 	}

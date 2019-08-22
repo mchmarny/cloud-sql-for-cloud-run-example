@@ -6,9 +6,10 @@ DIR="$(dirname "$0")"
 export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
     --format='value(ipAddresses[0].ipAddress)')
 
+# TODO: Move password to secrets
 export APP_PASSWORD=$(<"${CONF_DIR}/app_password")
+
 export DSN="${DB_USER}:${APP_PASSWORD}@tcp(${INSTANCE_IP})/sqlcrdb?parseTime=true"
-export KEYRING="projects/${PROJECT}/locations/global/keyRings/${INSTANCE}"
 
 
 gcloud beta run deploy $SERVICE \
@@ -17,4 +18,4 @@ gcloud beta run deploy $SERVICE \
 	--allow-unauthenticated \
     --platform managed \
 	--region $SERVICE_REGION \
-	--set-env-vars "DSN=${DSN},CERTS=${CONF_BUCKET},KEYRING=${KEYRING}"
+	--set-env-vars "DSN=${DSN},CERTS=${CONF_BUCKET}"

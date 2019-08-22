@@ -22,7 +22,6 @@ var (
 	projectID  = pr.GetIDOrFail()
 	connString = ev.MustGetEnvVar("DSN", "")
 	certBucket = ev.MustGetEnvVar("CERTS", "")
-	kmsKeyRing = ev.MustGetEnvVar("KEYRING", "")
 	initError  error
 )
 
