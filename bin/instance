@@ -24,6 +24,7 @@ gcloud sql instances create $INSTANCE \
     --maintenance-window-day SUN \
     --maintenance-window-hour 2
 
+
 # database
 gcloud sql databases create $DB_NAME \
     --instance $INSTANCE
