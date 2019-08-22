@@ -15,6 +15,15 @@ This sample outlines a process of setting up Cloud SQL instance with secure (TLS
 
 If you don't have one already, start by creating new project and configuring [Google Cloud SDK](https://cloud.google.com/sdk/docs/). Similarly, if you have not done so already, you will have [set up Cloud Run](https://cloud.google.com/run/docs/setup).
 
+## API
+
+In case you have not used some of the required GCP APIs, run [bin/api](bin/api) script to make sure they are all enabled:
+
+
+```shell
+bin/api
+```
+
 ## Setup
 
 To setup this service you will need to clone this repo:
