@@ -22,26 +22,36 @@ gcloud sql instances create $INSTANCE \
     --backup-start-time 03:00 \
     --maintenance-release-channel PRODUCTION \
     --maintenance-window-day SUN \
-    --maintenance-window-hour 2 \
-    --root-password $(openssl rand -base64 32)
+    --maintenance-window-hour 2
 
+# database
 gcloud sql databases create $DB_NAME \
     --instance $INSTANCE
 
-gcloud sql users create $DB_USER \
+# reset root password
+gcloud sql users set-password root \
     --instance $INSTANCE \
-    --password $(openssl rand -base64 32) \
+    --password=$(<"${CONF_DIR}/root_password") \
     --host %
 
+# create an app user
+gcloud sql users create $DB_USER \
+    --instance $INSTANCE \
+    --password=$(<"${CONF_DIR}/app_password") \
+    --host %
+
+# client key
 rm -f "${CONF_DIR}/client.key"
 gcloud sql ssl client-certs create client \
     "${CONF_DIR}/client.key" \
     --instance $INSTANCE
 
+# client cert
 gcloud sql ssl client-certs describe client \
     --instance $INSTANCE \
     --format 'value(cert)' > "${CONF_DIR}/client.pem"
 
+# server ca
 gcloud sql instances describe $INSTANCE \
     --format 'value(serverCaCert.cert)' > "${CONF_DIR}/ca.pem"
 

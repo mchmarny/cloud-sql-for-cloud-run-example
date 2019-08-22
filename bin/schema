@@ -6,14 +6,12 @@ DIR="$(dirname "$0")"
 export INSTANCE_IP=$(gcloud sql instances describe ${INSTANCE} \
     --format='value(ipAddresses[0].ipAddress)')
 
-mysql -h $INSTANCE_IP \
-      -u root \
+mysql --host $INSTANCE_IP \
+      --user $DB_USER \
+      --password=$(<"${CONF_DIR}/app_password") \
       --ssl-mode VERIFY_CA \
       --ssl-ca "${CONF_DIR}/ca.pem" \
       --ssl-cert "${CONF_DIR}/client.pem" \
       --ssl-key "${CONF_DIR}/client.key" \
       $DB_NAME < sql/schema.ddl
-
-
-
 

@@ -20,11 +20,8 @@ func apiRequestHandler(c *gin.Context) {
 	sessionID := newResponseID()
 
 	resp := &ResponseObject{
-		ID:      sessionID,
-		Ts:      time.Now().UTC().String(),
-		Bucket:  certBucket,
-		DSN:     connString,
-		KeyRing: kmsKeyRing,
+		ID: sessionID,
+		Ts: time.Now().UTC().String(),
 	}
 
 	// TODO: do it once on server start
@@ -70,12 +67,9 @@ func defaultRequestHandler(c *gin.Context) {
 
 // ResponseObject represents body of the request response
 type ResponseObject struct {
-	ID      string `json:"request_id"`
-	Ts      string `json:"request_on"`
-	Bucket  string `json:"cert_bucket"`
-	DSN     string `json:"db_conn_str"`
-	KeyRing string `json:"key_ring"`
-	Info    string `json:"info,omitempty"`
+	ID   string `json:"request_id"`
+	Ts   string `json:"request_on"`
+	Info string `json:"info,omitempty"`
 }
 
 func newResponseID() string {

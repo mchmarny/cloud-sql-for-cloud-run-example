@@ -31,6 +31,14 @@ cd logo-identifier
 
 ## Cloud SQL
 
+### Passwords
+
+The [bin/password](bin/password) script will generate root and app user passwords and saved them in a project scoped path under `.cloud-sql` folder in your home directory.
+
+```shell
+bin/password
+```
+
 ### Instance
 
 The [bin/instance](bin/instance) script will:
@@ -41,7 +49,7 @@ The [bin/instance](bin/instance) script will:
 * Set up application database user and its credentials
 * Create and download client SSL certificates from the newly created instance
 
-> Note, while the created Cloud SQL instance will be exposed to the world (`0.0.0.0/0`), it allow only SSL connections. Also, since all connections will require valid client certificates, the root and app user passwords will be set to random 32 characters long passwords. If you ever decide to remove the SSL connection requirements, you can reset the root password in the Cloud SQL UI.
+> Note, while the created Cloud SQL instance will be exposed to the world (`0.0.0.0/0`), it allow only SSL connections. Also, the root and app user passwords created in first step. If you ever decide to remove the SSL connection requirements, you can reset the root password in the Cloud SQL UI.
 
 ```shell
 bin/instance
@@ -57,14 +65,6 @@ The [bin/schema](bin/schema) script applies database schema located in [sql/sche
 bin/schema
 ```
 
-### Environment Config
-
-The [bin/env](bin/env) script creates `.my.cnf` [options file](https://dev.mysql.com/doc/refman/8.0/en/option-files.html) in your home directory with SSL configuration (certificates and key paths) to aid in future connections.
-
-```shell
-bin/env
-```
-
 ### Test Connection
 
 At this point you should be able to connect to the newly created database with this command:
@@ -72,10 +72,6 @@ At this point you should be able to connect to the newly created database with t
 ```shell
 bin/connect
 ```
-
-Alternatively, you can configure your client with a secure database connection:
-
-![](img/connui.png)
 
 ### Certificates
 
@@ -119,11 +115,6 @@ At this point you should be able to access your deployed service.
 
 > Note, there is currently no way tp predict the service URL, specifically the bit between the service name (`cloudsql-demo`) and the static Cloud Run domain (`uc.a.run.app`).
 
-To get info about the deployed service and backing Cloud SQL database run:
-
-```shell
-bin/info
-```
 
 Now, navigate in browser to the service URL which will return a JSON response.
 
@@ -131,9 +122,6 @@ Now, navigate in browser to the service URL which will return a JSON response.
 {
     "request_id":  "1224d739-cfa5-4500-9a8e-97df6a583aee",
     "request_on":  "2019-08-19 21:14:58.565436028 +0000 UTC",
-    "cert_bucket": "project-cloudsql-demo",
-    "db_conn_str": "root@tcp(104.154.161.x)/sqlcrdb?parseTime=true",
-    "key_ring":    "projects/project/locations/global/keyRings/cloudsql-demo",
     "info":        "Success - records saved: 1"
 }
 ```

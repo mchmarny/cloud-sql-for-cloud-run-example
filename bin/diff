@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+export O_DIR="${HOME}/.cloud-sql/${PROJECT}/${INSTANCE}"
+export D_DIR="${HOME}/.certs"
+
+diff "${O_DIR}/ca.pem" "${D_DIR}/ca.pem"
+diff "${O_DIR}/client.key" "${D_DIR}/client.key"
+diff "${O_DIR}/client.pem" "${D_DIR}/client.pem"
