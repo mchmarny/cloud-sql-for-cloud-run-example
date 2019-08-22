@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"os"
@@ -22,9 +23,17 @@ var (
 	connString = ev.MustGetEnvVar("DSN", "")
 	certBucket = ev.MustGetEnvVar("CERTS", "")
 	kmsKeyRing = ev.MustGetEnvVar("KEYRING", "")
+	initError  error
 )
 
 func main() {
+
+	ctx := context.Background()
+	if err := initData(ctx); err != nil {
+		logger.Printf("Error while initializing data: %v", err)
+		initError = err
+	}
+	defer closeData(ctx)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()

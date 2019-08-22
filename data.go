@@ -29,7 +29,7 @@ func initData(ctx context.Context) error {
 
 	// HACK: go mysql client doesn't read cnf files
 	// https://github.com/go-sql-driver/mysql/issues/542
-	dnsTLS, err := configTLS()
+	dnsTLS, err := configTLS(ctx)
 	if err != nil {
 		return errors.Wrap(err, "Error configuring TLS")
 	}
@@ -41,7 +41,7 @@ func initData(ctx context.Context) error {
 
 	if err := c.Ping(); err != nil {
 		c.Close()
-		return errors.Wrap(err, "Error connecting to DB")
+		return errors.Wrap(err, "Error pinging DB")
 	}
 
 	db = &mysqlDB{
@@ -63,7 +63,17 @@ func initData(ctx context.Context) error {
 
 }
 
-func configTLS() (dsnSufix string, err error) {
+func closeData(ctx context.Context) {
+	if db != nil && db.conn != nil {
+		db.conn.Close()
+	}
+}
+
+func configTLS(ctx context.Context) (dsnSufix string, err error) {
+
+	if e := initCertificates(ctx); e != nil {
+		return "", errors.Wrap(e, "Error while initializing TLS certs")
+	}
 
 	certDirPath, e := getCertDirPath()
 	if err != nil {
@@ -111,12 +121,6 @@ func configTLS() (dsnSufix string, err error) {
 
 	return "&tls=custom", nil
 
-}
-
-func finalizeData(ctx context.Context) {
-	if db != nil && db.conn != nil {
-		db.conn.Close()
-	}
 }
 
 func countSession(ctx context.Context, sessionID string) (c int64, err error) {

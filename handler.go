@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -24,26 +23,11 @@ func apiRequestHandler(c *gin.Context) {
 		Ts: time.Now().UTC().String(),
 	}
 
-	// TODO: do it once on server start
-	ctx := context.Background()
-
-	err := initCertificates(ctx)
-	if err != nil {
-		logger.Printf("Error while initializing TLS certs: %v", err)
-		resp.Info = err.Error()
+	if initError != nil {
+		resp.Info = initError.Error()
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-
-	err = initData(ctx)
-	if err != nil {
-		logger.Printf("Error while initializing data: %v", err)
-		resp.Info = err.Error()
-		c.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-
-	defer finalizeData(ctx)
 
 	count, err := countSession(c.Request.Context(), sessionID)
 	if err != nil {
@@ -53,7 +37,7 @@ func apiRequestHandler(c *gin.Context) {
 		return
 	}
 
-	resp.Info = fmt.Sprintf("Success - records saved: %d", count)
+	resp.Info = fmt.Sprintf("Success - saved %d records", count)
 	c.JSON(http.StatusOK, resp)
 
 }

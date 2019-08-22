@@ -30,7 +30,6 @@ func getCertDirPath() (path string, err error) {
 		return "", errors.Wrap(e, "Error getting current user")
 	}
 	return filepath.Join(u.HomeDir, certDirName), nil
-
 }
 
 func initCertificates(ctx context.Context) error {
