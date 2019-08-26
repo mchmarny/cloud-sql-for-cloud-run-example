@@ -104,6 +104,8 @@ bin/image
 
 ### Service Account
 
+> This is specific right now to the managed version of Cloud Run, skip it if you are deploying to Cloud Run on GKE
+
 After that, create a service account and assign it the necessary roles using the [bin/user](bin/user) script
 
 ```shell
@@ -112,13 +114,19 @@ bin/user
 
 ### Managed Service Deployment
 
-Once the container image and service account are ready, you can deploy the new service using [bin/service](bin/service) script
+Once the container image and service account are ready, you can deploy the new service using either [bin/deploy-managed](bin/deploy-managed) or [bin/deploy-gke](bin/deploy-gke) scripts
 
 ```shell
-bin/service
+bin/deploy-managed
 ```
 
-### Cloud Run
+or
+
+```shell
+bin/deploy-gke
+```
+
+### Testing Service on Cloud Run
 
 At this point you should be able to access your deployed service.
 
@@ -137,12 +145,12 @@ Now, navigate in browser to the service URL which will return a JSON response.
 
 If for some reason there were errors while inviting the service, the response will include the error details in the `info` field.
 
-### Run Service Locally
+### Testing Service Locally
 
-You can run the sample service locally by executing the [bin/run](bin/run) script
+You can run the sample service locally by executing the [bin/run-local](bin/run-local) script
 
 ```shell
-bin/run
+bin/run-local
 ```
 
 And navigating to http://localhost:8080/v1/test
